@@ -3,6 +3,7 @@ package examplepackage
 import (
 	"context"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 )
@@ -59,10 +60,16 @@ func (examplepackage *ExamplePackageImpl) SaySomething(ctx context.Context) erro
 	os.Setenv("LD_LIBRARY_PATH", ldLibraryPath)
 
 	cmd := exec.Command("/opt/senzing/g2/python/G2ConfigTool.py")
-	out, err := cmd.Output()
-	if err != nil {
-		fmt.Println(">>>>>> 2")
-	}
-	fmt.Println(string(out))
+
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+	log.Println(cmd.Run())
+
+	// out, err := cmd.Output()
+	// if err != nil {
+	// 	fmt.Println(">>>>>> 2")
+	// }
+	// fmt.Println(string(out))
 	return nil
 }
