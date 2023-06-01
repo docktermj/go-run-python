@@ -2,7 +2,6 @@ package examplepackage
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -38,11 +37,10 @@ Output
     See the example output.
 */
 func (examplepackage *ExamplePackageImpl) SaySomething(ctx context.Context) error {
-	fmt.Printf("%s: %s\n", exampleConstant, examplepackage.Something)
 
-	fmt.Println(">>>>>> 1")
+	// Set environment variables.
 
-	ldLibraryPath := "/opt/senzing/g2/lib/"
+	os.Setenv("LD_LIBRARY_PATH", "/opt/senzing/g2/lib/")
 	senzingEngineConfigurationJson := `
 	        {
           "PIPELINE": {
@@ -55,16 +53,25 @@ func (examplepackage *ExamplePackageImpl) SaySomething(ctx context.Context) erro
             "CONNECTION": "sqlite3://na:na@/tmp/sqlite/G2C.db"
           }
         }`
-
 	os.Setenv("SENZING_ENGINE_CONFIGURATION_JSON", senzingEngineConfigurationJson)
-	os.Setenv("LD_LIBRARY_PATH", ldLibraryPath)
 
-	cmd := exec.Command("/opt/senzing/g2/python/G2ConfigTool.py")
+	// Arguments
+
+	arguments := []string{}
+
+	// Run command.
+
+	cmd := exec.CommandContext(ctx, "/opt/senzing/g2/python/G2ConfigTool.py", arguments...)
 
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
-	log.Println(cmd.Run())
+	err := cmd.Run()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// fmt.Printf(">>>>>>>> x: %+v\n", x)
 
 	// out, err := cmd.Output()
 	// if err != nil {
